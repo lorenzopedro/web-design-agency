@@ -11,26 +11,22 @@ export default function CTASection({ onInquireClick }: CTASectionProps) {
   return (
     <section
       id="cta"
-      className="relative h-screen w-full overflow-hidden bg-black flex flex-col justify-between py-16 md:py-24 px-6 md:px-16 lg:px-20 z-10"
+      className="relative h-screen w-full overflow-hidden bg-transparent flex flex-col justify-between py-16 md:py-24 px-6 md:px-16 lg:px-20 z-10"
     >
-      {/* Background Atmosphere Image */}
-      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        <motion.img
-          src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1920&q=80"
-          alt="Atmospheric Contact Background"
-          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-screen"
-          initial={{ scale: 1.15 }}
-          whileInView={{ scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          referrerPolicy="no-referrer"
-        />
-        {/* Cinematic dark overlays to ensure readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/85 to-black" />
-      </div>
-
       {/* Cinematic Ambient Background */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
+        {/* Background Looping Video (Requested by user) */}
+        <video
+          src="https://flow-content.google/video/8a8d30a1-8c24-4091-8743-c0b576b4933b?Expires=1784590025&KeyName=labs-flow-prod-cdn-key&Signature=uPnQ3bohW-5_9O-UgesrZFPuz44"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover brightness-[0.4] contrast-[1.05] z-0"
+        />
+        {/* Gradient shadows positioned above the video and below the text content */}
+        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-10" />
         {/* Deep Ambient Glow 1 */}
         <motion.div
           animate={{

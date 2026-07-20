@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import FadingVideo from "./components/FadingVideo";
+import TestimonialsContactBackground from "./components/TestimonialsContactBackground";
 import BlurText from "./components/BlurText";
 import CustomCursor from "./components/CustomCursor";
 import CTASection from "./components/CTASection";
@@ -46,6 +47,13 @@ export default function App() {
   const card1Y = useTransform(capabilitiesProgress, [0, 1], [30, -30]);
   const card2Y = useTransform(capabilitiesProgress, [0, 1], [0, 0]); // baseline
   const card3Y = useTransform(capabilitiesProgress, [0, 1], [-30, 30]);
+
+  // Testimonials and Contact shared scroll tracking
+  const testimonialsContactRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: testimonialsContactProgress } = useScroll({
+    target: testimonialsContactRef,
+    offset: ["start end", "end end"],
+  });
 
   // Cinematic preloader progress simulator + Font Loader Detection
   useEffect(() => {
@@ -196,19 +204,19 @@ export default function App() {
       {/* ========================================================= */}
       {/* NAVIGATION BAR                                            */}
       {/* ========================================================= */}
-      <nav className="fixed top-3 md:top-4 left-0 right-0 z-50 flex justify-between items-center px-4 md:px-6 lg:px-12 pointer-events-none">
+      <nav className="fixed top-2 md:top-2.5 left-0 right-0 z-50 flex justify-between items-center px-4 md:px-6 lg:px-12 pointer-events-none">
         {/* Left: Brand mark */}
         <div className="pointer-events-auto">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="liquid-glass h-9 w-9 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
+            className="liquid-glass h-8 w-8 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-300"
           >
-            <span className="font-heading italic text-lg text-white">a</span>
+            <span className="font-heading italic text-base text-white">a</span>
           </button>
         </div>
 
         {/* Center: Interactive navigation capsule */}
-        <div className="hidden md:flex items-center gap-0.5 liquid-glass rounded-full px-1.5 py-1 pointer-events-auto">
+        <div className="hidden md:flex items-center gap-0.5 liquid-glass rounded-full px-1.5 py-0.5 pointer-events-auto">
           {[
             { label: "Home", action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
             { label: "Capabilities", action: handleScrollToCapabilities },
@@ -216,22 +224,26 @@ export default function App() {
               const el = document.getElementById("testimonials");
               if (el) el.scrollIntoView({ behavior: "smooth" });
             }},
-            { label: "Contact", action: () => setShowContactModal(true) }
+            { label: "Contact", action: () => {
+              const el = document.getElementById("cta");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }},
+            { label: "GSAP Demo ↗", action: () => window.open("/scroll-transition.html", "_blank") }
           ].map((item) => (
             <button
               key={item.label}
               onClick={item.action}
-              className="px-3 py-1 text-[11px] font-mono tracking-wider uppercase text-white/70 hover:text-white transition-colors cursor-pointer"
+              className="px-2.5 py-0.5 text-[10px] font-mono tracking-wider uppercase text-white/70 hover:text-white transition-colors cursor-pointer"
             >
               {item.label}
             </button>
           ))}
           <button
             onClick={() => setShowContactModal(true)}
-            className="bg-white text-black hover:bg-white/90 rounded-full px-3.5 py-1 text-[10px] font-mono tracking-wider uppercase flex items-center gap-1 transition-colors ml-1 cursor-pointer shadow-md"
+            className="bg-white text-black hover:bg-white/90 rounded-full px-2.5 py-0.5 text-[9px] font-mono tracking-wider uppercase flex items-center gap-1 transition-colors ml-1 cursor-pointer shadow-md"
           >
             <span>Start</span>
-            <ArrowUpRight size={11} />
+            <ArrowUpRight size={10} />
           </button>
         </div>
 
@@ -240,13 +252,13 @@ export default function App() {
           {/* Mobile project button */}
           <button
             onClick={() => setShowContactModal(true)}
-            className="md:hidden bg-white text-black hover:bg-white/90 rounded-full px-3 py-1 text-[10px] font-mono tracking-wider uppercase flex items-center gap-1 transition-colors cursor-pointer"
+            className="md:hidden bg-white text-black hover:bg-white/90 rounded-full px-2.5 py-0.5 text-[9px] font-mono tracking-wider uppercase flex items-center gap-1 transition-colors cursor-pointer"
           >
             <span>Start</span>
-            <ArrowUpRight size={11} />
+            <ArrowUpRight size={10} />
           </button>
           {/* Anchor spacer */}
-          <div className="hidden md:block h-9 w-9" />
+          <div className="hidden md:block h-8 w-8" />
         </div>
       </nav>
 
@@ -541,14 +553,16 @@ export default function App() {
       </section>
 
       {/* ========================================================= */}
-      {/* TESTIMONIALS CAROUSEL SECTION                             */}
+      {/* TESTIMONIALS & CONTACT SECTIONS (WITH SHARED SCROLL BG)   */}
       {/* ========================================================= */}
-      <TestimonialCarousel />
+      <div ref={testimonialsContactRef} className="relative w-full">
+        {/* Shared Scroll-Driven Cinematic Background */}
+        <TestimonialsContactBackground scrollYProgress={testimonialsContactProgress} />
 
-      {/* ========================================================= */}
-      {/* SECTION 3: CALL TO ACTION (THE EXPERIENCE CENTRAL)        */}
-      {/* ========================================================= */}
-      <CTASection onInquireClick={() => setShowContactModal(true)} />
+        <TestimonialCarousel />
+
+        <CTASection onInquireClick={() => setShowContactModal(true)} />
+      </div>
 
       {/* ========================================================= */}
       {/* FOOTER SECTION                                            */}
@@ -565,136 +579,243 @@ export default function App() {
         {/* Contact / Start a Project Modal */}
         {showContactModal && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(16px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+            style={{ perspective: 1200 }}
             onClick={() => {
               setShowContactModal(false);
               setContactSubmitted(false);
             }}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="liquid-glass-strong w-full max-w-lg rounded-[2rem] p-8 md:p-10 relative text-left"
+              initial={{ scale: 0.9, opacity: 0, y: 40, rotateX: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0, rotateX: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 30, rotateX: -6 }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="liquid-glass-strong w-full max-w-lg rounded-[2.5rem] p-8 md:p-10 relative text-left overflow-hidden border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.8)]"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Dynamic cinematic floating ambient orbs for background depth */}
+              <div className="absolute top-[-20%] right-[-10%] w-72 h-72 bg-[#5c6c5a]/20 rounded-full filter blur-[60px] pointer-events-none select-none animate-pulse duration-[8000ms]" />
+              <div className="absolute bottom-[-15%] left-[-15%] w-60 h-60 bg-white/5 rounded-full filter blur-[50px] pointer-events-none select-none" />
+
               {/* Close Button */}
               <button
                 onClick={() => {
                   setShowContactModal(false);
                   setContactSubmitted(false);
                 }}
-                className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors h-8 w-8 rounded-full flex items-center justify-center bg-white/5 cursor-pointer"
+                className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors h-9 w-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/5 cursor-pointer z-10"
               >
                 ✕
               </button>
 
               {!contactSubmitted ? (
-                <form onSubmit={handleContactSubmit} className="space-y-6">
-                  <div>
-                    <h3 className="font-heading italic text-4xl text-white tracking-tight">
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.08,
+                        delayChildren: 0.15
+                      }
+                    },
+                    exit: {
+                      opacity: 0,
+                      transition: {
+                        staggerChildren: 0.04,
+                        staggerDirection: -1
+                      }
+                    }
+                  }}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="relative z-10 space-y-6"
+                >
+                  {/* Header Title with custom fade/blur stagger */}
+                  <motion.div
+                    variants={{
+                      hidden: { y: 20, opacity: 0, filter: "blur(6px)" },
+                      visible: { y: 0, opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 100, damping: 15 } },
+                      exit: { y: -10, opacity: 0, filter: "blur(4px)" }
+                    }}
+                  >
+                    <h3 className="font-heading italic text-4xl sm:text-5xl text-white tracking-tight leading-none">
                       Start a Project
                     </h3>
-                    <p className="text-sm font-body font-light text-white/70 mt-1">
+                    <p className="text-xs sm:text-sm font-body font-light text-white/60 mt-2">
                       Tell us about your ambition. We respond in under 24 hours.
                     </p>
-                  </div>
+                  </motion.div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-body font-medium text-white/60 mb-1">
+                  {/* Aesthetic Separation Line */}
+                  <motion.div
+                    variants={{
+                      hidden: { scaleX: 0, opacity: 0 },
+                      visible: { scaleX: 1, opacity: 0.2, transition: { duration: 0.8, ease: "circOut" } },
+                      exit: { scaleX: 0, opacity: 0 }
+                    }}
+                    className="h-[1px] w-full bg-gradient-to-r from-transparent via-white to-transparent origin-center"
+                  />
+
+                  {/* Form Container with Staggered Inputs */}
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
+                    {/* Input Block 1: Name */}
+                    <motion.div
+                      variants={{
+                        hidden: { y: 15, opacity: 0, filter: "blur(4px)" },
+                        visible: { y: 0, opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 110, damping: 16 } },
+                        exit: { y: -10, opacity: 0, filter: "blur(4px)" }
+                      }}
+                    >
+                      <label className="block text-[10px] font-mono tracking-widest uppercase text-white/50 mb-1">
                         Your Name
                       </label>
                       <input
                         type="text"
                         required
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 font-body transition-colors"
+                        className="w-full bg-white/[0.02] hover:bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/10 font-body transition-all duration-300 placeholder-white/20"
                         placeholder="Lorenzo Pedro"
                       />
-                    </div>
+                    </motion.div>
 
-                    <div>
-                      <label className="block text-xs font-body font-medium text-white/60 mb-1">
+                    {/* Input Block 2: Email */}
+                    <motion.div
+                      variants={{
+                        hidden: { y: 15, opacity: 0, filter: "blur(4px)" },
+                        visible: { y: 0, opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 110, damping: 16 } },
+                        exit: { y: -10, opacity: 0, filter: "blur(4px)" }
+                      }}
+                    >
+                      <label className="block text-[10px] font-mono tracking-widest uppercase text-white/50 mb-1">
                         Email Address
                       </label>
                       <input
                         type="email"
                         required
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 font-body transition-colors"
+                        className="w-full bg-white/[0.02] hover:bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/10 font-body transition-all duration-300 placeholder-white/20"
                         placeholder="lorenzo@example.com"
                       />
-                    </div>
+                    </motion.div>
 
-                    <div>
-                      <label className="block text-xs font-body font-medium text-white/60 mb-1">
+                    {/* Input Block 3: Budget */}
+                    <motion.div
+                      variants={{
+                        hidden: { y: 15, opacity: 0, filter: "blur(4px)" },
+                        visible: { y: 0, opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 110, damping: 16 } },
+                        exit: { y: -10, opacity: 0, filter: "blur(4px)" }
+                      }}
+                    >
+                      <label className="block text-[10px] font-mono tracking-widest uppercase text-white/50 mb-1">
                         Budget Range
                       </label>
-                      <select className="w-full bg-black/80 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 font-body transition-colors">
-                        <option value="15-25">$15k – $25k</option>
-                        <option value="25-50">$25k – $50k</option>
-                        <option value="50-100">$50k – $100k</option>
-                        <option value="100+">$100k+</option>
-                      </select>
-                    </div>
+                      <div className="relative">
+                        <select className="w-full bg-neutral-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/90 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/10 font-body transition-all duration-300 appearance-none cursor-pointer">
+                          <option value="15-25">$15k – $25k</option>
+                          <option value="25-50">$25k – $50k</option>
+                          <option value="50-100">$50k – $100k</option>
+                          <option value="100+">$100k+</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 text-xs">
+                          ▼
+                        </div>
+                      </div>
+                    </motion.div>
 
-                    <div>
-                      <label className="block text-xs font-body font-medium text-white/60 mb-1">
+                    {/* Input Block 4: How can we help */}
+                    <motion.div
+                      variants={{
+                        hidden: { y: 15, opacity: 0, filter: "blur(4px)" },
+                        visible: { y: 0, opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 110, damping: 16 } },
+                        exit: { y: -10, opacity: 0, filter: "blur(4px)" }
+                      }}
+                    >
+                      <label className="block text-[10px] font-mono tracking-widest uppercase text-white/50 mb-1">
                         How can we help?
                       </label>
                       <textarea
                         required
                         rows={3}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 font-body transition-colors resize-none"
+                        className="w-full bg-white/[0.02] hover:bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/10 font-body transition-all duration-300 resize-none placeholder-white/20"
                         placeholder="A brand-defining cinematic web experience for..."
                       />
+                    </motion.div>
+
+                    {/* Submit Button Block */}
+                    <motion.div
+                      variants={{
+                        hidden: { y: 20, opacity: 0, filter: "blur(6px)" },
+                        visible: { y: 0, opacity: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 100, damping: 15, delay: 0.1 } },
+                        exit: { y: -5, opacity: 0 }
+                      }}
+                      className="pt-2"
+                    >
+                      <button
+                        type="submit"
+                        className="w-full bg-white text-black hover:bg-white/95 rounded-full py-4 text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                      >
+                        <span className="font-mono uppercase tracking-wider text-xs">Submit Proposal</span>
+                        <ArrowUpRight size={15} />
+                      </button>
+                    </motion.div>
+                  </form>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-center py-8 space-y-6 relative z-10"
+                >
+                  {/* Outer circle of confirmation */}
+                  <div className="relative h-20 w-20 mx-auto">
+                    {/* Ring animation */}
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1.15, opacity: [0, 0.3, 0] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
+                      className="absolute inset-0 border border-white/40 rounded-full"
+                    />
+                    <div className="absolute inset-0 h-20 w-20 bg-white/10 border border-white/10 rounded-full flex items-center justify-center shadow-lg">
+                      <svg
+                        className="h-10 w-10 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <motion.path
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ delay: 0.2, duration: 0.6, ease: "easeInOut" }}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    className="w-full bg-white text-black hover:bg-white/90 rounded-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <span>Submit Proposal</span>
-                    <ArrowUpRight size={16} />
-                  </button>
-                </form>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-8 space-y-4"
-                >
-                  <div className="h-16 w-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg
-                      className="h-8 w-8 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                  <div className="space-y-2">
+                    <h4 className="font-heading italic text-4xl text-white">
+                      Proposal Received
+                    </h4>
+                    <p className="text-sm font-body font-light text-white/70 max-w-sm mx-auto leading-relaxed">
+                      Thank you! Your information has been received. Our principal designer will reach out to you within 12 hours.
+                    </p>
                   </div>
-                  <h4 className="font-heading italic text-3xl text-white">
-                    Proposal Received
-                  </h4>
-                  <p className="text-sm font-body font-light text-white/70 max-w-sm mx-auto">
-                    Thank you! Your information has been received. Our principal designer will reach out to you within 12 hours.
-                  </p>
+
                   <button
                     onClick={() => {
                       setContactSubmitted(false);
                       setShowContactModal(false);
                     }}
-                    className="mt-6 bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full text-xs font-medium font-body transition-colors cursor-pointer"
+                    className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full text-xs font-medium font-mono uppercase tracking-wider border border-white/15 transition-all duration-300 cursor-pointer"
                   >
                     Close Window
                   </button>

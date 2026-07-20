@@ -90,24 +90,8 @@ export default function TestimonialCarousel() {
   return (
     <section
       id="testimonials"
-      className="relative h-screen w-full overflow-hidden bg-black flex flex-col justify-center px-6 md:px-16 lg:px-20 z-10"
+      className="relative h-screen w-full overflow-hidden bg-transparent flex flex-col justify-center px-6 md:px-16 lg:px-20 z-10"
     >
-      {/* Background Atmosphere Image */}
-      <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        <motion.img
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80"
-          alt="Atmospheric Testimonials Background"
-          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-screen"
-          initial={{ scale: 1.15 }}
-          whileInView={{ scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          referrerPolicy="no-referrer"
-        />
-        {/* Cinematic dark overlays to ensure readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black" />
-      </div>
-
       {/* Decorative vertical lines for structured Swiss grid feel */}
       <div className="absolute inset-y-0 left-10 md:left-20 w-px bg-white/[0.02] pointer-events-none z-10" />
       <div className="absolute inset-y-0 right-10 md:right-20 w-px bg-white/[0.02] pointer-events-none z-10" />
