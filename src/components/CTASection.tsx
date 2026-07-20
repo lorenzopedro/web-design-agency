@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import FadingVideo from "./FadingVideo";
@@ -8,17 +8,48 @@ interface CTASectionProps {
 }
 
 export default function CTASection({ onInquireClick }: CTASectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const section = sectionRef.current;
+    if (!video || !section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch((err) => {
+            console.log("Video playback prevented or interrupted:", err);
+          });
+        } else {
+          video.pause();
+        }
+      },
+      {
+        threshold: 0.05, // trigger when 5% of the section is visible
+      }
+    );
+
+    observer.observe(section);
+
+    return () => {
+      observer.unobserve(section);
+    };
+  }, []);
+
   return (
     <section
       id="cta"
+      ref={sectionRef}
       className="relative h-screen w-full overflow-hidden bg-transparent flex flex-col justify-between py-16 md:py-24 px-6 md:px-16 lg:px-20 z-10"
     >
       {/* Cinematic Ambient Background */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
         {/* Background Looping Video (Requested by user) */}
         <video
+          ref={videoRef}
           src="https://flow-content.google/video/8a8d30a1-8c24-4091-8743-c0b576b4933b?Expires=1784590025&KeyName=labs-flow-prod-cdn-key&Signature=uPnQ3bohW-5_9O-UgesrZFPuz44"
-          autoPlay
           loop
           muted
           playsInline
